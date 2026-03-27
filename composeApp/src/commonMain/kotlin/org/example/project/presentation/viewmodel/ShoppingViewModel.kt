@@ -168,7 +168,12 @@ class ShoppingViewModel(
                                 created = shopList.created,
                                 name = shopList.name,
                                 id = shopList.id,
-                                items = result
+                                items = result,
+                                itemIdToIndex = result
+                                    .withIndex()
+                                    .associate { (index, item) ->
+                                        item.id to index
+                                    }
                             )
 
                             it.copy(lists = newLists, loading = false)
@@ -199,7 +204,8 @@ class ShoppingViewModel(
                                         created = currentTime(),
                                         name = name,
                                         id = listId,
-                                        items = emptyList()
+                                        items = emptyList(),
+                                        itemIdToIndex = emptyMap()
                                     )
                                 ),
                                 listIdToIndex = it.listIdToIndex.plus(
@@ -248,9 +254,7 @@ class ShoppingViewModel(
         }
     }
 
-    fun toggleList(shopListIndex: Int) {
-        val listId = state.value.lists[shopListIndex].id
-
+    fun toggleList(listId: Long) {
         viewModelScope.launch {
             if(state.value.expandedSetIds.contains(listId)) {
                 _state.update {
@@ -269,11 +273,10 @@ class ShoppingViewModel(
         }
     }
 
-    fun addToShopList(shopListIndex: Int, value: String, n: Int) {
+    fun addToShopList(listId: Long, value: String, n: Int) {
         viewModelScope.launch {
             _state.update { it.copy(loading = true, error = null) }
 
-            val listId = state.value.lists[shopListIndex].id
             addToShopListUseCase(listId, value, n)
                 .onSuccess { result ->
                     getShopList(listId)
@@ -288,11 +291,12 @@ class ShoppingViewModel(
     }
 
 
-    fun updateItemShopList(shopListIndex: Int, itemIndex: Int, name: String, n: Int) {
+    fun updateItemShopList(listId: Long, itemId: Long, name: String, n: Int) {
         viewModelScope.launch {
+            val shopListIndex = state.value.listIdToIndex[listId]?: return@launch
+            val itemIndex = state.value.lists[shopListIndex].itemIdToIndex[itemId]?: return@launch
             _state.update { it.copy(loading = true, error = null) }
 
-            val itemId = state.value.lists[shopListIndex].items[itemIndex].id
             updateItemShopListUseCase(itemId, name, n)
                 .onSuccess { result ->
                     _state.update {
@@ -317,11 +321,13 @@ class ShoppingViewModel(
         }
     }
 
-    fun removeItemFromList(shopListIndex: Int, itemIndex: Int) {
+    fun removeItemFromList(listId: Long, itemId: Long) {
         viewModelScope.launch {
+            val shopListIndex = state.value.listIdToIndex[listId]?: return@launch
+            val itemIndex = state.value.lists[shopListIndex].itemIdToIndex[itemId]?: return@launch
+
             _state.update { it.copy(loading = true, error = null) }
 
-            val itemId = state.value.lists[shopListIndex].items[itemIndex].id
             removeItemFromShopListUseCase(itemId)
                 .onSuccess { result ->
                     _state.update {
@@ -343,11 +349,13 @@ class ShoppingViewModel(
     }
 
 
-    fun crossItemOff(shopListIndex: Int, itemIndex: Int) {
+    fun crossItemOff(listId: Long, itemId: Long) {
         viewModelScope.launch {
+            val shopListIndex = state.value.listIdToIndex[listId]?: return@launch
+            val itemIndex = state.value.lists[shopListIndex].itemIdToIndex[itemId]?: return@launch
+
             _state.update { it.copy(loading = true, error = null) }
 
-            val itemId = state.value.lists[shopListIndex].items[itemIndex].id
             crossItemOffUseCase(itemId)
                 .onSuccess { result ->
                     _state.update {
@@ -372,9 +380,11 @@ class ShoppingViewModel(
         }
     }
 
-    fun moveItem(shopListIndex: Int, draggedIndex: Int, targetPosition: Int) {
+    fun moveItem(listId: Long, draggedIndex: Int, targetPosition: Int) {
         if(targetPosition !in draggedIndex..(draggedIndex + 1)) {
             viewModelScope.launch {
+                val shopListIndex = state.value.listIdToIndex[listId]?: return@launch
+
                 _state.update { it.copy(loading = true, error = null) }
 
                 moveItemUseCase(state.value.lists[shopListIndex].items, draggedIndex, targetPosition)

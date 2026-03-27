@@ -95,12 +95,12 @@ fun MainScreenContent(
     onLogout: () -> Unit,
     onCreateList: (name: String) -> Unit,
     onRemoveList: (listId: Long) -> Unit,
-    onToggleList: (shopListIndex: Int) -> Unit,
-    onAddItem: (shopListIndex: Int, name: String, count: Int) -> Unit,
-    onCrossItem: (shopListIndex: Int, itemIndex: Int) -> Unit,
-    onDeleteItem: (shopListIndex: Int, itemIndex: Int) -> Unit,
-    onMoveItem: (shopListIndex: Int, draggedIndex: Int, targetPosititon: Int) -> Unit,
-    onEditItem: (shopListIndex: Int, itemIndex: Int, name: String, count: Int) -> Unit
+    onToggleList: (listId: Long) -> Unit,
+    onAddItem: (listId: Long, name: String, count: Int) -> Unit,
+    onCrossItem: (listId: Long, itemId: Long) -> Unit,
+    onDeleteItem: (listId: Long, itemId: Long) -> Unit,
+    onMoveItem: (listId: Long, draggedIndex: Int, targetPosititon: Int) -> Unit,
+    onEditItem: (listId: Long, itemId: Long, name: String, count: Int) -> Unit
 ) {
 
     Scaffold { paddingValues ->
@@ -192,7 +192,7 @@ fun MainScreenContent(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onToggleList(shopListIndex) },
+                            .clickable { onToggleList(list.id) },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -216,7 +216,7 @@ fun MainScreenContent(
                             }
 
                             IconButton(onClick = {
-                                onToggleList(shopListIndex)
+                                onToggleList(list.id)
                             }) {
                                 if(state.expandedSetIds.contains(list.id)) {
                                     Icon(
@@ -274,7 +274,7 @@ fun MainScreenContent(
                             IconButton(onClick = {
                                 if(nameTextFieldState.text.isNotBlank()) {
                                     onAddItem(
-                                        shopListIndex,
+                                        list.id,
                                         nameTextFieldState.text.toString(),
                                         countTextFieldState.text.toString().toInt()
                                     )
@@ -334,7 +334,7 @@ fun MainScreenContent(
                                                 onDragEnd = {
                                                     if(draggedIndex.value != null && targetPosition.value != null)
                                                         onMoveItem(
-                                                            shopListIndex,
+                                                            list.id,
                                                             draggedIndex.value!!,
                                                             targetPosition.value!!
                                                         )
@@ -349,19 +349,19 @@ fun MainScreenContent(
                                         item = item,
                                         onCross = {
                                             onCrossItem(
-                                                shopListIndex,
-                                                itemIndex
+                                                list.id,
+                                                item.id
                                             )
                                         },
                                         onDelete = {
                                             onDeleteItem(
-                                                shopListIndex,
-                                                itemIndex
+                                                list.id,
+                                                item.id
                                             )
                                         },
                                         onEdit = { name, count ->
                                             onEditItem(
-                                                shopListIndex, itemIndex,
+                                                list.id, item.id,
                                                 name, count
                                             )
                                         },
@@ -522,7 +522,8 @@ fun MainScreenPreview() {
                 items = listOf(
                     ShoppingItem("Молоко", false, 1, 2),
                     ShoppingItem("Хлеб", true, 2, 3)
-                )
+                ),
+                itemIdToIndex = emptyMap()
             ),
             ShoppingList(
                 id = 2,
@@ -530,7 +531,8 @@ fun MainScreenPreview() {
                 created = "23.05.26",
                 items = listOf(
                     ShoppingItem("Мышка", false, 3, 1)
-                )
+                ),
+                itemIdToIndex = emptyMap()
             )
         ),
         expandedSetIds = setOf(1),

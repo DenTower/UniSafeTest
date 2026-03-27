@@ -23,7 +23,8 @@ data class ShoppingListDto(
             created = formatTime(created),
             name = name,
             id = id,
-            items = emptyList()
+            items = emptyList(),
+            itemIdToIndex = emptyMap()
         )
     }
 }

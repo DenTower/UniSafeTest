@@ -4,5 +4,6 @@ data class ShoppingList(
     val created: String,
     val name: String,
     val id: Long,
-    val items: List<ShoppingItem>
+    val items: List<ShoppingItem>,
+    val itemIdToIndex: Map<Long, Int>
 )

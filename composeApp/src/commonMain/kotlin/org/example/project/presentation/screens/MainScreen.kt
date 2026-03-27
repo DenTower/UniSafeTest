@@ -110,10 +110,6 @@ fun MainScreenContent(
                 .padding(horizontal = 16.dp)
         ) {
 
-            state.error?.let {
-                Text(it, color = Color.Red)
-            }
-
             if(state.loading) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }

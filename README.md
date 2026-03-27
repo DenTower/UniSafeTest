@@ -7,7 +7,6 @@
   элементов, во избежание последствий изменений индексов путем обновления данных после чужого
   запроса к серверу.
 
-Основные операции:
 - UpdateShoppingList: за O(1) берется элемент который пользователь выбрал для редактирования и
   делается запрос на изменение с новыми значениями для полей элемента
 - RemoveShoppingList: за O(1) берется по индексу id списка и отправляется запрос на
@@ -34,6 +33,14 @@
   отрисовке главного экрана, также происходит за O(N) переприсвоение в мапе id to index
 - Authentication: O(1) вызывается при аунтефикации по ключу, при успехе ключ сохраняется и
   открывается главный экран
+<table>
+  <tr>
+    <td><img width="288" height="624" alt="Screenshot_20260327-140343" src="https://github.com/user-attachments/assets/e7415ead-29b4-454d-91df-b5d626aedd18" /></td>
+    <td style="border-left:2px solid #ccc;"></td>
+    <td><img width="288" height="624" alt="Screenshot_20260327-140552" src="https://github.com/user-attachments/assets/c3301571-1fd7-4774-8f52-80ba1691815a" /></td>
+  </tr>
+</table>
+<img width="1462" height="865" alt="UniSafeTestIphone" src="https://github.com/user-attachments/assets/2da5eb2a-501d-4d6e-ac52-b4b84d3a8504" />
 
 This is a Kotlin Multiplatform project targeting Android, iOS.
 
